@@ -24,3 +24,6 @@ RESOURCES += \
 
 RC_FILE += \
     qftp.rc
+
+OTHER_FILES += \
+    Readme.txt

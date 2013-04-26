@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QFtp>
 #include <QFile>
+#include <QMessageBox>
+#include <QTimer>
 
 namespace Ui {
 class Dialog;
@@ -29,7 +31,7 @@ private slots:
     void ftpFinished(int,bool);
     void ftpListInfo(const QUrlInfo&);
     void ftpProgress(qint64,qint64);
-    
+    void ftpAbort();
 private:
     Ui::Dialog *ui;
 
@@ -37,6 +39,7 @@ private:
     QFtp ftp;
     QFile *file;
     QStringList files;
+    QTimer *qtimer;
 };
 
 #endif // DIALOG_H

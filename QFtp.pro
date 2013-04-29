@@ -22,8 +22,8 @@ FORMS    += dialog.ui
 RESOURCES += \
     resource.qrc
 
-RC_FILE += \
-    qftp.rc
+#RC_FILE += \
+#    qftp.rc
 
 OTHER_FILES += \
     Readme.txt

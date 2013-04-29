@@ -95,7 +95,27 @@ void Dialog::upClicked(){
 }
 
 void Dialog::getClicked(){
+    QString fileName =
+            QFileDialog::getSaveFileName( this, tr("Get File"),
+                    ui->listWidget->selectedItems()[0]->text() );
+    if( fileName.isEmpty() )
+        return;
 
+    file = new QFile( fileName, this );
+    if( !file->open( QIODevice::WriteOnly|QIODevice::Truncate ) )
+    {
+        QMessageBox::warning( this, tr("Error"),
+            tr("Failed to open file %1 for writing.").arg( fileName ) );
+        delete file;
+        file = 0;
+        return;
+    }
+    ui->DisconnectButton->setEnabled( false );
+    ui->changeDirectoryButton->setEnabled( false );
+    ui->UpButton->setEnabled( false );
+    ui->getFileButton->setEnabled( false );
+    ftp.get( ui->listWidget->selectedItems()[0]->text(), file );
+    ui->StatusText->setText( tr("Downloading file...") );
 }
 
 void Dialog::selectionChanged(){
@@ -145,6 +165,15 @@ void Dialog::ftpFinished(int request,bool error){
                 QMessageBox::warning( this, tr("Error"),tr("Failed to change directory.") );
                 getFileList();
             break;
+            case QFtp::Get:
+                QMessageBox::warning( this, tr("Error"), tr("Failed to get file?") );
+                file->close();
+                file->remove();
+                delete file;
+                file = 0;
+                ui->DisconnectButton->setEnabled( true );
+                ui->DisconnectButton->setEnabled( true );
+                selectionChanged();
             default:
             break;
         }
@@ -178,6 +207,15 @@ void Dialog::ftpFinished(int request,bool error){
             case QFtp::Cd:
                 getFileList();
             break;
+            case QFtp::Get:
+                file->close();
+                delete file;
+                file = 0;
+                ui->DisconnectButton->setEnabled( true );
+                ui->UpButton->setEnabled( true );
+                selectionChanged();
+                ui->StatusText->setText( tr("Ready.") );
+            break;
         default:
             break;
         }
@@ -193,8 +231,12 @@ void Dialog::ftpListInfo(const QUrlInfo& info){
 
 }
 
-void Dialog::ftpProgress(qint64,qint64){
-
+void Dialog::ftpProgress(qint64 done,qint64 total){
+    if( total == 0 )
+    return;
+    ui->StatusText->setText(
+        tr("Downloading file... (%1%)")
+            .arg( QString::number( done*100.0/total, 'f', 1 ) ) );
 }
 
 void Dialog::getFileList(){

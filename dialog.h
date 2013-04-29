@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTimer>
+#include <QFileDialog>
 
 namespace Ui {
 class Dialog;

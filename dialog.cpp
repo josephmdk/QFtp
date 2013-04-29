@@ -76,11 +76,22 @@ void Dialog::disconnectClicked(){
 }
 
 void Dialog::cdClicked(){
+    ui->DisconnectButton->setEnabled( false );
+    ui->changeDirectoryButton->setEnabled( false );
+    ui->UpButton->setEnabled( false );
+    ui->getFileButton->setEnabled( false );
 
+    ftp.cd( ui->listWidget->selectedItems()[0]->text() );
+    ui->StatusText->setText( tr("Changing directory...") );
 }
 
 void Dialog::upClicked(){
-
+    ui->DisconnectButton->setEnabled( false );
+    ui->changeDirectoryButton->setEnabled( false );
+    ui->UpButton->setEnabled( false );
+    ui->getFileButton->setEnabled( false );
+    ftp.cd("..");
+    ui->StatusText->setText( tr("Changing directory...") );
 }
 
 void Dialog::getClicked(){
@@ -88,7 +99,24 @@ void Dialog::getClicked(){
 }
 
 void Dialog::selectionChanged(){
-
+    if( !ui->listWidget->selectedItems().isEmpty() )
+    {
+        if( files.indexOf( ui->listWidget->selectedItems()[0]->text() ) == -1 )
+        {
+           ui->changeDirectoryButton->setEnabled( ui->DisconnectButton->isEnabled() );
+           ui->getFileButton->setEnabled( false );
+        }
+        else
+        {
+            ui->changeDirectoryButton->setEnabled( false );
+            ui->getFileButton->setEnabled( ui->DisconnectButton->isEnabled() );
+        }
+    }
+    else
+    {
+        ui->changeDirectoryButton->setEnabled( false );
+        ui->getFileButton->setEnabled( false );
+    }
 }
 
 void Dialog::ftpFinished(int request,bool error){
@@ -113,7 +141,10 @@ void Dialog::ftpFinished(int request,bool error){
                 tr("Failed to get file list.\nClosing connection.") );
                 ftp.close();
             break;
-
+            case QFtp::Cd:
+                QMessageBox::warning( this, tr("Error"),tr("Failed to change directory.") );
+                getFileList();
+            break;
             default:
             break;
         }
@@ -143,6 +174,9 @@ void Dialog::ftpFinished(int request,bool error){
                 ui->DisconnectButton->setEnabled( true );
                 ui->UpButton->setEnabled( true );
                 ui->StatusText->setText( tr("Ready.") );
+            break;
+            case QFtp::Cd:
+                getFileList();
             break;
         default:
             break;

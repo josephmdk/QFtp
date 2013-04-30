@@ -1,5 +1,6 @@
 #include "dialog.h"
 #include "ui_dialog.h"
+#include <QDebug>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -95,9 +96,10 @@ void Dialog::upClicked(){
 }
 
 void Dialog::getClicked(){
+    qDebug() << ui->listWidget->selectedItems()[0]->text();
     QString fileName =
             QFileDialog::getSaveFileName( this, tr("Get File"),
-                    ui->listWidget->selectedItems()[0]->text() );
+                    ui->listWidget->selectedItems()[0]->text());
     if( fileName.isEmpty() )
         return;
 

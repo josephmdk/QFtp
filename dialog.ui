@@ -45,7 +45,7 @@
      <item>
       <widget class="QLineEdit" name="HostLineEdit">
        <property name="text">
-        <string/>
+        <string>ftp.rediris.es</string>
        </property>
       </widget>
      </item>
